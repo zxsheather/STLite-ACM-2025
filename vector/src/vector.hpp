@@ -6,14 +6,14 @@
 #include <climits>
 #include <cstddef>
 
-namespace sjtu 
+namespace sjtu
 {
 /**
  * a data container like std::vector
  * store data in a successive memory and support random access.
  */
 template<typename T>
-class vector 
+class vector
 {
 public:
 	/**
@@ -25,14 +25,14 @@ public:
 	 * you can see RandomAccessIterator at CppReference for help.
 	 */
 	class const_iterator;
-	class iterator 
+	class iterator
 	{
 	// The following code is written for the C++ type_traits library.
 	// Type traits is a C++ feature for describing certain properties of a type.
-	// For instance, for an iterator, iterator::value_type is the type that the 
-	// iterator points to. 
-	// STL algorithms and containers may use these type_traits (e.g. the following 
-	// typedef) to work properly. In particular, without the following code, 
+	// For instance, for an iterator, iterator::value_type is the type that the
+	// iterator points to.
+	// STL algorithms and containers may use these type_traits (e.g. the following
+	// typedef) to work properly. In particular, without the following code,
 	// @code{std::sort(iter, iter1);} would not compile.
 	// See these websites for more information:
 	// https://en.cppreference.com/w/cpp/header/type_traits
@@ -55,25 +55,25 @@ public:
 		 * return a new iterator which pointer n-next elements
 		 * as well as operator-
 		 */
-		iterator operator+(const int &n) const 
+		iterator operator+(const int &n) const
 		{
 			//TODO
 		}
-		iterator operator-(const int &n) const 
+		iterator operator-(const int &n) const
 		{
 			//TODO
 		}
 		// return the distance between two iterators,
 		// if these two iterators point to different vectors, throw invaild_iterator.
-		int operator-(const iterator &rhs) const 
+		int operator-(const iterator &rhs) const
 		{
 			//TODO
 		}
-		iterator& operator+=(const int &n) 
+		iterator& operator+=(const int &n)
 		{
 			//TODO
 		}
-		iterator& operator-=(const int &n) 
+		iterator& operator-=(const int &n)
 		{
 			//TODO
 		}
@@ -112,7 +112,7 @@ public:
 	 * TODO
 	 * has same function as iterator, just for a const object.
 	 */
-	class const_iterator 
+	class const_iterator
 	{
 	public:
 		using difference_type = std::ptrdiff_t;
@@ -120,7 +120,7 @@ public:
 		using pointer = T*;
 		using reference = T&;
 		using iterator_category = std::output_iterator_tag;
-	
+
 	private:
 		/*TODO*/
 
@@ -167,11 +167,13 @@ public:
 	 * returns an iterator to the beginning.
 	 */
 	iterator begin() {}
+	const_iterator begin() const {}
 	const_iterator cbegin() const {}
 	/**
 	 * returns an iterator to the end.
 	 */
 	iterator end() {}
+	const_iterator end() const {}
 	const_iterator cend() const {}
 	/**
 	 * checks whether the container is empty
