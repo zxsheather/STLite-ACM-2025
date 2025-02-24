@@ -14,10 +14,12 @@ constexpr int EXPANSION_THRESHOLD_US = 100;
 int main() {
     vector<int> vec;
     
+    auto start_time = high_resolution_clock::now();
     // 第一阶段：push_back 1e6 个元素
     for (int i = 0; i < 1000000; ++i) {
         vec.push_back(i);
     }
+
     
     // 记录当前大小
     size_t initial_size = vec.size();
@@ -59,6 +61,10 @@ int main() {
     cerr << "Time taken for 100000 rounds of 16 push-pops (ms): " 
          << duration_cast<milliseconds>(end - start).count() << endl;
     cerr << "Final size: " << vec.size() << endl;
+
+    auto end_time = high_resolution_clock::now();
+    cerr << "Total time taken (ms): " 
+         << duration_cast<milliseconds>(end_time - start_time).count() << endl;
     
     return 0;
 }

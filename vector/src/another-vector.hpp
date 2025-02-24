@@ -7,6 +7,7 @@
 #include "exceptions.hpp"
 
 constexpr size_t DEFAULT_CAPACITY = 100;
+
 namespace sjtu {
 /**
  * a data container like std::vector
@@ -43,7 +44,7 @@ class vector {
     using value_type = T;
     using pointer = T *;
     using reference = T &;
-    using iterator_category = std::random_access_iterator_tag;
+    using iterator_category = std::output_iterator_tag;
 
    private:
     /**
@@ -120,7 +121,7 @@ class vector {
     /**
      * TODO *it
      */
-    T &operator*() const { return (container->data_[index]); }
+    T &operator*() const { return *(container->data_[index]); }
     /**
      * a operator to check whether two iterators are same (pointing to the same
      * memory address).
@@ -159,7 +160,7 @@ class vector {
     size_t index;
     const_iterator(const vector<T> *_container = nullptr, size_t _index = 0)
         : container(_container), index(_index) {}
-    const T &operator*() const { return (container->data_[index]); }
+    const T &operator*() const { return *(container->data_[index]); }
 
     bool operator==(const const_iterator &rhs) const {
       return index == rhs.index && container == rhs.container;
@@ -187,19 +188,22 @@ class vector {
       return temp;
     }
   };
+
   /**
    * TODO Constructs
    * At least two: default constructor, copy constructor
    */
-  vector() : size_(0), capacity_(DEFAULT_CAPACITY) {
-    data_ = reinterpret_cast<T *>(::operator new(sizeof(T) * capacity_));
+  vector() {
+    data_ = new T *[DEFAULT_CAPACITY];
+    size_ = 0;
+    capacity_ = DEFAULT_CAPACITY;
   }
   vector(const vector &other) {
+    data_ = new T *[other.capacity_];
     size_ = other.size_;
     capacity_ = other.capacity_;
-    data_ = reinterpret_cast<T *>(::operator new(sizeof(T) * capacity_));
     for (size_t i = 0; i < size_; ++i) {
-      new (data_ + i) T(other.data_[i]);
+      data_[i] = new T(*(other.data_[i]));
     }
   }
   /**
@@ -207,9 +211,9 @@ class vector {
    */
   ~vector() {
     for (size_t i = 0; i < size_; ++i) {
-      data_[i].~T();
+      delete data_[i];
     }
-    ::operator delete(data_);
+    delete[] data_;
   }
   /**
    * TODO Assignment operator
@@ -219,14 +223,14 @@ class vector {
       return *this;
     }
     for (size_t i = 0; i < size_; ++i) {
-      data_[i].~T();
+      delete data_[i];
     }
-    ::operator delete(data_);
+    delete[] data_;
+    data_ = new T *[other.capacity_];
     size_ = other.size_;
     capacity_ = other.capacity_;
-    data_ = reinterpret_cast<T *>(::operator new(sizeof(T) * capacity_));
     for (size_t i = 0; i < size_; ++i) {
-      new (data_ + i) T(other.data_[i]);
+      data_[i] = new T(*(other.data_[i]));
     }
     return *this;
   }
@@ -238,13 +242,13 @@ class vector {
     if (pos < 0 || pos >= size_) {
       throw index_out_of_bound();
     }
-    return data_[pos];
+    return *data_[pos];
   }
   const T &at(const size_t &pos) const {
     if (pos < 0 || pos >= size_) {
       throw index_out_of_bound();
     }
-    return data_[pos];
+    return *data_[pos];
   }
   /**
    * assigns specified element with bounds checking
@@ -256,13 +260,13 @@ class vector {
     if (pos < 0 || pos >= size_) {
       throw index_out_of_bound();
     }
-    return data_[pos];
+    return *data_[pos];
   }
   const T &operator[](const size_t &pos) const {
     if (pos < 0 || pos >= size_) {
       throw index_out_of_bound();
     }
-    return data_[pos];
+    return *data_[pos];
   }
   /**
    * access the first element.
@@ -272,7 +276,7 @@ class vector {
     if (size_ == 0) {
       throw container_is_empty();
     }
-    return data_[0];
+    return *data_[0];
   }
   /**
    * access the last element.
@@ -282,7 +286,7 @@ class vector {
     if (size_ == 0) {
       throw container_is_empty();
     }
-    return data_[size_ - 1];
+    return *data_[size_ - 1];
   }
   /**
    * returns an iterator to the beginning.
@@ -309,9 +313,12 @@ class vector {
    */
   void clear() {
     for (size_t i = 0; i < size_; ++i) {
-      data_[i].~T();
+      delete data_[i];
     }
+    delete[] data_;
+    data_ = new T *[DEFAULT_CAPACITY];
     size_ = 0;
+    capacity_ = DEFAULT_CAPACITY;
   }
   /**
    * inserts value before pos
@@ -322,10 +329,9 @@ class vector {
       double_space();
     }
     for (size_t i = size_; i > pos.index; --i) {
-      new (data_ + i) T(data_[i - 1]);
-      data_[i - 1].~T();
+      data_[i] = data_[i - 1];
     }
-    new (data_ + pos.index) T(value);
+    data_[pos.index] = new T(value);
     ++size_;
     return pos;
   }
@@ -344,12 +350,11 @@ class vector {
       double_space();
     }
     for (size_t i = size_; i > ind; --i) {
-      new (data_ + i) T(data_[i - 1]);
-      data_[i - 1].~T();
+      data_[i] = data_[i - 1];
     }
-    new (data_ + ind) T(value);
+    data_[ind] = new T(value);
     ++size_;
-    return iterator(this, ind);
+    return iterator(data_[ind], this, ind);
   }
   /**
    * removes the element at pos.
@@ -358,15 +363,15 @@ class vector {
    * returned.
    */
   iterator erase(iterator pos) {
-    if (pos.index >= size_) {
-      throw index_out_of_bound();
-    }
-    data_[pos.index].~T();
+    delete data_[pos.index];
     for (size_t i = pos.index; i < size_ - 1; ++i) {
-      new (data_ + i) T(data_[i + 1]);
-      data_[i + 1].~T();
+      data_[i] = data_[i + 1];
     }
+    data_[size_ - 1] = nullptr;
     --size_;
+    if (size_ < capacity_ / 4 && capacity_ > DEFAULT_CAPACITY*2) {
+      half_space();
+    }
     return pos;
   }
   /**
@@ -378,13 +383,17 @@ class vector {
     if (ind >= size_) {
       throw index_out_of_bound();
     }
-    data_[ind].~T();
+    delete data_[ind];
     for (size_t i = ind; i < size_ - 1; ++i) {
-      new (data_ + i) T(data_[i + 1]);
-      data_[i + 1].~T();
+      data_[i] = data_[i + 1];
     }
+    data_[size_ - 1] = nullptr;
     --size_;
-    return iterator(this, ind);
+    if (size_ < capacity_ / 4 && capacity_ > DEFAULT_CAPACITY*2) {
+      half_space();
+    }
+
+    return iterator(data_[ind], this, ind);
   }
   /**
    * adds an element to the end.
@@ -393,7 +402,7 @@ class vector {
     if (size_ == capacity_) {
       double_space();
     }
-    new (data_ + size_) T(value);
+    data_[size_] = new T(value);
     ++size_;
   }
   /**
@@ -404,25 +413,34 @@ class vector {
     if (size_ == 0) {
       throw container_is_empty();
     }
-    data_[size_ - 1].~T();
+    delete data_[size_ - 1];
     --size_;
+    if (size_ < capacity_ / 4 && capacity_ > 1) {
+      half_space();
+    }
   }
 
  private:
-  T *data_;
+  T **data_;
   size_t size_;
   size_t capacity_;
-
   void double_space() {
-    T *new_data =
-        reinterpret_cast<T *>(::operator new(sizeof(T) * capacity_ * 2));
+    T **tmp = data_;
+    data_ = new T *[capacity_ * 2];
     for (size_t i = 0; i < size_; ++i) {
-      new (new_data + i) T(data_[i]);
-      data_[i].~T();
+      data_[i] = tmp[i];
     }
-    ::operator delete(data_);
-    data_ = new_data;
-    capacity_ *= 2;
+    delete[] tmp;
+    capacity_ = capacity_ * 2;
+  }
+
+  void half_space() {
+    T **tmp = data_;
+    data_ = new T *[capacity_ / 2];
+    for (size_t i = 0; i < size_; ++i) {
+      data_[i] = tmp[i];
+    }
+    delete[] tmp;
   }
 };
 
