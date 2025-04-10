@@ -8,7 +8,8 @@
 #include<cstdlib>
 #include<cstring>
 #include<algorithm>
-#include "map.hpp"
+#include<cassert>
+#include "../../src/map.hpp"
 
 using namespace std;
 
@@ -480,16 +481,27 @@ bool check12(){ // erase(it++)
 		it = Q.find(num[i]); Q.erase(it++);
 		stdit = stdQ.find(num[i]); stdQ.erase(stdit++);
 		if(it == Q.end()){
-			if(stdit != stdQ.end()) return 0;
+			if(stdit != stdQ.end()){
+				std::cerr<<"Fail at "<<i<<"on line 484"<<std::endl;
+				std::cerr<<it -> first<<" "<<stdit -> first<<std::endl;
+				return 0;
+			}
 		}
 		else{
-			if(it -> first != stdit -> first) return 0;
+			if(it -> first != stdit -> first){
+				std::cerr<<"Fail at "<<i<<"on line 491"<<std::endl;
+				std::cerr<<it -> first<<" "<<stdit -> first<<std::endl;
+				return 0;
+			}
 		}
 	}	
 	if(Q.size() != stdQ.size()) return 0;
 	it = Q.begin();
 	for(stdit = stdQ.begin(); stdit != stdQ.end(); stdit++){ 
-		if(stdit -> first != it -> first) return 0;
+		if(stdit -> first != it -> first){
+			std::cerr<<"Fail at "<<it -> first<<" "<<stdit -> first<<"on line 502"<<std::endl;
+			return 0;
+		}
 		if(stdit -> second != (*it).second) return 0;
 		it++;
 	}
@@ -600,7 +612,7 @@ void easy_test(){
 }
 
 int main(){
-	//freopen("testans_advance.out", "w", stdout);
+	freopen("testans_advance.out", "w", stdout);
 	srand(time(NULL));
 	easy_test();
 	if(!check1()) cout << "Test 1 Failed......" << endl; else cout << "Test 1 Passed!" << endl;

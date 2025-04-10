@@ -5,8 +5,8 @@
 #include <algorithm>
 #include <map>
 #include <ctime>
-#include "exceptions.hpp"
-#include "map.hpp"
+#include "../../src/exceptions.hpp"
+#include "../../src/map.hpp"
 
 const int MAXN = 50001;
 
@@ -580,8 +580,8 @@ void tester11() {
 		std::map<IntA, IntB, Compare>::const_iterator citA = stdtmp.cbegin();
 		sjtu::map<IntA, IntB, Compare>::const_iterator citB = srctmp.cbegin();
 		
-		stdtmp.size();
-		srctmp.size();
+		std::cout<<stdtmp.size();
+		std::cout<<srctmp.size();
 		
 		for (auto x : ret) {
 			if (x >= 0) {

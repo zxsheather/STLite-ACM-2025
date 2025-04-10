@@ -1,4 +1,4 @@
-#include "map.hpp"
+#include "../../src/map.hpp"
 #include <iostream>
 #include <cassert>
 #include <string>
@@ -37,11 +37,15 @@ public:
 
 void tester(void) {
 	//	test: constructor
+	//std::cout << "test: constructor" << std::endl;
 	sjtu::map<Integer, std::string, Compare> map;
 	//	test: empty(), size()
+	//std::cout << "test: empty(), size()" << std::endl;
 	assert(map.empty() && map.size() == 0);
 	//	test: operator[], insert()
+	//std::cout << "test: operator[], insert()" << std::endl;
 	for (int i = 0; i < 100000; ++i) {
+		//std::cout << i << " ";
 		std::string string = "";
 		for (int number = i; number; number /= 10) {
 			char digit = '0' + number % 10;
@@ -57,15 +61,20 @@ void tester(void) {
 		}
 	}
 	//	test: count(), find(), erase()
+	//std::cout << "test: count(), find(), erase()" << std::endl;
 	for (int i = 0; i < 100000; ++i) {
 		if (i > 1896 && i <= 2016) {
 			continue;
 		}
-		assert(map.count(Integer(i)) == 1);
+		if(map.count(Integer(i)) == 0) {
+			std::cerr << "count error: " << i << std::endl;
+			assert(false);
+		}
 		assert(map.find(Integer(i)) != map.end());
 		map.erase(map.find(Integer(i)));
 	}
 	//	test: constructor, operator=, clear();
+	//std::cout << "test: constructor, operator=, clear()" << std::endl;
 	for (int i = 0; i < (int)map.size(); ++i) {
 		sjtu::map<Integer, std::string, Compare> copy(map);
 		map.clear();
@@ -105,6 +114,7 @@ void tester(void) {
 	while (map.begin() != map.end()) {
 		map.erase(map.begin());
 	}
+	//std::cout<<map.size()<<std::endl;
 	assert(map.empty() && map.size() == 0);
 	//	test: operator[]
 	for (int i = 0; i < 100000; ++i) {
@@ -114,6 +124,7 @@ void tester(void) {
 }
 
 int main(void) {
+	freopen("test.out", "w", stdout);
 	tester();
 	std::cout << Integer::counter << std::endl;
 }

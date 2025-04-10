@@ -1,4 +1,4 @@
-#include "map.hpp"
+#include "../../src/map.hpp"
 #include <iostream>
 #include <cassert>
 #include <string>
@@ -80,6 +80,7 @@ void tester(void) {
 }
 
 int main(void) {
+	freopen("test.out", "w", stdout);
 	std::ios::sync_with_stdio(false);
 	std::cin.tie(0);
 	std::cout.tie(0);

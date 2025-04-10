@@ -1,3 +1,4 @@
+#include <cassert>
 #include<iostream>
 #include<map>
 #include<ctime>
@@ -8,7 +9,7 @@
 #include<cstdlib>
 #include<cstring>
 #include<algorithm>
-#include "map.hpp"
+#include "../../src/map.hpp"
 
 using namespace std;
 
@@ -358,6 +359,10 @@ class node{
 	bool operator !=(const node &b) const{
 		return num != b.num;
 	}
+	friend ostream& operator <<(ostream &out, const node &a){
+		out << a.num;
+		return out;
+	}
 };
 bool check10(){//class writen by users
 	int a, b;
@@ -365,6 +370,7 @@ bool check10(){//class writen by users
 	std::map<node, int> stdQ;
 	for(int i = 1; i <= 3000; i++){
 		a = rand(); b = rand();
+		
 		if(!Q.count(a)){
 			Q[node(a)] = b; stdQ[node(a)] = b;
 		}
@@ -372,8 +378,10 @@ bool check10(){//class writen by users
 	while(!stdQ.empty()){
 		if(Q.begin() -> first != stdQ.begin() -> first || Q.begin() -> second != stdQ.begin() -> second) return 0; 
 		Q.erase(Q.begin());
+		
 		stdQ.erase(stdQ.begin());
 	}
+	
 	if(Q.begin() != Q.end()) return 0;
 	Q.clear(); stdQ.clear();
 	sjtu::map<node, int> :: iterator it;
@@ -383,10 +391,13 @@ bool check10(){//class writen by users
 	for(int i = 1; i <= 2000; i++) num[i] = i;
 	for(int i = 2001; i <= 3000; i++) num[i] = i - 2000;
 	for(int i = 1; i <= 6000; i++) swap(num[rand() % 3000 + 1], num[rand() % 3000 + 1]);
+	std::cout<<395<<std::endl;
 	for(int i = 1; i <= 3000; i++){
 		if(left[num[i]]){
 			if(stdQ.count(node(num[i]))){
-				it = Q.find(node(num[i])); Q.erase(it);
+				it = Q.find(node(num[i])); 
+				//Q.printNodeAndChildren(it,0);
+				Q.erase(it);
 				stdit = stdQ.find(node(num[i])); stdQ.erase(stdit);
 			}
 			else cout << "fuck you!" << endl;
@@ -397,6 +408,7 @@ bool check10(){//class writen by users
 			left[num[i]]++;
 		}
 	}
+	std::cout<<"410"<<std::endl;
 	if(Q.size() != stdQ.size()) return 0;
 	it = Q.begin();
 	for(stdit = stdQ.begin(); stdit != stdQ.end(); stdit++){ 
